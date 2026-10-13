@@ -1,0 +1,15 @@
+{
+  "papertrail": {
+    "command": "npx",
+    "args": ["-y", "@andreimaxim/papertrail-mcp"],
+    "env": {
+      "PAPERTRAIL_QA_API_TOKEN": "${PAPERTRAIL_QA_API_TOKEN}",
+      "PAPERTRAIL_QA_API_BASE_URL": "${PAPERTRAIL_QA_API_BASE_URL}",
+      "PAPERTRAIL_STAGING_API_TOKEN": "${PAPERTRAIL_STAGING_API_TOKEN}",
+      "PAPERTRAIL_STAGING_API_BASE_URL": "${PAPERTRAIL_STAGING_API_BASE_URL}",
+      "PAPERTRAIL_PROD_API_TOKEN": "${PAPERTRAIL_PROD_API_TOKEN}",
+      "PAPERTRAIL_PROD_API_BASE_URL": "${PAPERTRAIL_PROD_API_BASE_URL}"
+    },
+    "includeTools": ["papertrail_list_environments", "papertrail_get"]
+  }
+}

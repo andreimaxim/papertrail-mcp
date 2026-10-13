@@ -1,18 +1,6 @@
 ---
 name: using-papertrail
 description: Investigates migrated Papertrail logs through the read-only SolarWinds Observability logs API. Use for production log searches, incident triage, request tracing, and log correlation.
-mcpServers:
-  papertrail:
-    command: npx
-    args: ["-y", "@andreimaxim/papertrail-mcp"]
-    env:
-      PAPERTRAIL_QA_API_TOKEN: "${PAPERTRAIL_QA_API_TOKEN}"
-      PAPERTRAIL_QA_API_BASE_URL: "${PAPERTRAIL_QA_API_BASE_URL}"
-      PAPERTRAIL_STAGING_API_TOKEN: "${PAPERTRAIL_STAGING_API_TOKEN}"
-      PAPERTRAIL_STAGING_API_BASE_URL: "${PAPERTRAIL_STAGING_API_BASE_URL}"
-      PAPERTRAIL_PROD_API_TOKEN: "${PAPERTRAIL_PROD_API_TOKEN}"
-      PAPERTRAIL_PROD_API_BASE_URL: "${PAPERTRAIL_PROD_API_BASE_URL}"
-    includeTools: ["papertrail_list_environments", "papertrail_get"]
 ---
 
 # Using Papertrail

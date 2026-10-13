@@ -1,6 +1,6 @@
 # Papertrail MCP
 
-A focused, read-only Model Context Protocol server for searching migrated Papertrail logs through the SolarWinds Observability API. It runs locally over stdio and works with Amp, Claude Code, Codex, and other stdio-capable MCP clients.
+A focused, read-only Model Context Protocol server for searching migrated Papertrail logs through the SolarWinds Observability API. It runs locally over stdio and works with any stdio-capable MCP client.
 
 ## Tools
 
@@ -39,46 +39,30 @@ npx -y @andreimaxim/papertrail-mcp
 
 The process communicates over stdio, so running it directly waits for an MCP client and may appear idle.
 
-## Amp
+## Client configuration
 
-The distributable [`using-papertrail` skill](skill/using-papertrail/SKILL.md) starts the MCP server only when Papertrail work loads the skill. Copy it into a project's skill directory:
+Register the server as a stdio MCP server that runs `npx -y @andreimaxim/papertrail-mcp`. Many clients accept a JSON configuration like this:
 
-```bash
-mkdir -p .agents/skills/using-papertrail
-cp skill/using-papertrail/SKILL.md .agents/skills/using-papertrail/SKILL.md
+```json
+{
+  "mcpServers": {
+    "papertrail": {
+      "command": "npx",
+      "args": ["-y", "@andreimaxim/papertrail-mcp"],
+      "env": {
+        "PAPERTRAIL_PROD_API_TOKEN": "${PAPERTRAIL_PROD_API_TOKEN}",
+        "PAPERTRAIL_PROD_API_BASE_URL": "${PAPERTRAIL_PROD_API_BASE_URL}"
+      }
+    }
+  }
+}
 ```
 
-In Amp, add the corresponding variables under personal, project, or workspace **Secrets & Env Vars**, storing each `_API_TOKEN` value as a secret. The bundled skill forwards conventional `qa`, `staging`, and `prod` profiles. Add another variable pair to its `mcpServers.papertrail.env` map when using a custom profile name.
+The exact file location and syntax depend on the client. Make sure the client forwards both `PAPERTRAIL_<ENVIRONMENT>_API_TOKEN` and `PAPERTRAIL_<ENVIRONMENT>_API_BASE_URL` for every profile you want to use, and store each `_API_TOKEN` value in the client's secret storage where available.
 
-Amp discovers the skill, launches the MCP process, and keeps its two tools hidden until the skill is loaded. The previous `amp.papertrail.*` settings are not read by this portable server.
+## Skill
 
-## Claude Code
-
-Register the server at user scope:
-
-```bash
-claude mcp add --scope user --transport stdio papertrail -- \
-  npx -y @andreimaxim/papertrail-mcp
-```
-
-Launch Claude Code with the desired `PAPERTRAIL_<ENVIRONMENT>_API_TOKEN` and `PAPERTRAIL_<ENVIRONMENT>_API_BASE_URL` variables available. A project `.mcp.json` can declare the equivalent command while referring to securely managed environment variables.
-
-## Codex
-
-Add the server to `~/.codex/config.toml` or a trusted project's `.codex/config.toml`:
-
-```toml
-[mcp_servers.papertrail]
-command = "npx"
-args = ["-y", "@andreimaxim/papertrail-mcp"]
-env_vars = [
-  "PAPERTRAIL_PROD_API_TOKEN",
-  "PAPERTRAIL_PROD_API_BASE_URL",
-]
-enabled_tools = ["papertrail_list_environments", "papertrail_get"]
-```
-
-Add both variable names for every additional profile that Codex should forward.
+The optional [`using-papertrail` skill](skill/using-papertrail/) teaches an agent how to search logs, follow pagination, and handle sensitive output. Its `mcp.json` declares the server for clients that let skills bundle MCP servers, so the server starts only when the skill is loaded. Copy the complete `skill/using-papertrail` directory into your client's skills directory. The bundled configuration forwards the conventional `qa`, `staging`, and `prod` profiles. Add another variable pair to the `papertrail.env` map in `mcp.json` when using a custom profile name.
 
 ## Development
 
@@ -94,4 +78,4 @@ Repository layout:
 - `src/server.ts`: MCP schemas, read-only annotations, and tool handlers.
 - `src/index.ts`: stdio executable.
 - `test/`: client and MCP protocol tests.
-- `skill/using-papertrail/`: optional Amp skill.
+- `skill/using-papertrail/`: optional agent skill.
